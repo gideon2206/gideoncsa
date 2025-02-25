@@ -1,0 +1,20 @@
+        LXI H, C050H       ; Load the starting address of data
+        MOV C, M           ; Load count of numbers in register C
+        MOV B, C           ; Copy count to B
+        LXI H, C051H       ; Point to the first number in the array
+        MOV A, M           ; Assume the first number is the minimum
+        INX H              ; Move to the next number
+
+FIND_MIN:
+        MOV D, M           ; Load the current number into D
+        CMP D              ; Compare A (current min) with D
+        JC SKIP            ; If A < D, skip (keep A as min)
+        MOV A, D           ; Else, update A with the new minimum
+
+SKIP:
+        INX H              ; Move to the next number
+        DCR B              ; Decrease counter
+        JNZ FIND_MIN       ; Repeat until all numbers are checked
+
+        STA C060H          ; Store the minimum value at C060H
+        HLT                ; Halt the program
