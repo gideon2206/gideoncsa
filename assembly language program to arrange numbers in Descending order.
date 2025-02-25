@@ -1,0 +1,40 @@
+        MVI D, 00H         ; D register will be used as a flag
+        LXI H, C050H       ; Load the starting address of data
+        MOV C, M           ; Load count of numbers in register C
+        MOV B, C           ; Copy count to B for outer loop
+
+SORT_LOOP:
+        MOV B, C           ; Reset B for the inner loop
+        DCR B              ; Outer loop runs (N-1) times
+        MOV H, C           ; Keep count in H
+        DCR H
+
+        LXI H, C051H       ; Point to the first data element
+        MOV D, 00H         ; Reset flag for swapping
+
+INNER_LOOP:
+        MOV A, M           ; Load first number into A
+        INX H              ; Move to the next number
+        CMP M              ; Compare A with the next number
+        JNC NO_SWAP        ; If A >= M, no swap needed (descending order)
+
+        MOV E, M           ; Swap numbers: store M in E
+        MOV M, A           ; Store A in M
+        DCX H              ; Move back to first number
+        MOV M, E           ; Store E in M
+        INX H              ; Move to next number
+        MVI D, 01H         ; Set flag to indicate swapping
+
+NO_SWAP:
+        DCR H              ; Decrease inner loop counter
+        JNZ INNER_LOOP     ; If H is not zero, continue inner loop
+
+        MOV A, D           ; Check if any swap happened
+        CPI 00H            ; If no swap, sorting is complete
+        JZ DONE            ; Exit if no swaps
+
+        DCR C              ; Decrease count for outer loop
+        JNZ SORT_LOOP      ; Repeat sorting loop
+
+DONE:
+        HLT                ; Halt the program
